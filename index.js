@@ -11,7 +11,26 @@ const app = express();
 
 conectarDB(); // Conectar a la base de datos
 
-app.use(cors()); // Habilitar CORS para todas las rutas
+const allowedOrigins = [
+  'https://frontend-proyecto-final-ultima-vers.vercel.app',
+  'http://localhost:4200',
+  'http://localhost:5173'
+];
+
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin) return callback(null, true); // Permitir Postman/curl
+    return allowedOrigins.includes(origin)
+      ? callback(null, true)
+      : callback(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization','x-auth-token'],
+  optionsSuccessStatus: 204
+}));
+
+// Responder explícitamente preflights
+app.options('*', cors());
 
 const port = 3000;
 
